@@ -58,3 +58,6 @@ target/
 /.env
 venv/
 /MANIFEST
+
+tags
+.DS_Store

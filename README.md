@@ -9,28 +9,50 @@ Inspired by [pylint-django](https://github.com/landscapeio/pylint-django).
 
 ### Problems pylint-twisted solves:
 
-1. Recognize `defer.inlineCallbacks` style imports.  Say you have the following code:
+1. Recognize generator with `defer.inlineCallbacks` decorator returns Deferred object.  Say you have the following code:
 
    ```python
-    from flask.ext import wtf
-    from flask.ext.wtf import validators
+    from twisted.internet import defer
 
-    class PostForm(wtf.Form):
-        content = wtf.TextAreaField('Content', validators=[validators.Required()])
+    @defer.inlineCallbacks
+    def func():
+        yield some_other_func()
+
+    def normal_deferred_func():
+        d = foo()
+        d.addCallback(lambda _: None)
+        d.addErrback(lambda _: None)
    ```
 
    Normally, pylint will throw errors like:
 
    ```
-    E:  1,0: No name 'wtf' in module 'flask.ext'
-    E:  2,0: No name 'wtf' in module 'flask.ext'
-    F:  2,0: Unable to import 'flask.ext.wtf'
+    E:  1,0: No name 'addCallback' in generator 'func'
+    E:  2,0: No name 'addErrback' in generator 'func'
    ```
 
    As pylint builds it's own abstract syntax tree, `pylint-twisted` will translate
-   the `flask.ext` imports into the actual module name, so pylint can continue
+   the `@defer.inlineCallbacks` decorator to return Deferred object instead of a generator, so pylint can continue
    checking your code.
-   
+
+2. Recognize `twisted.internet.reactor` module. Say you have the following code:
+
+   ```python
+    from twisted.internet import reactor
+
+    def foo():    
+        return reactor.seconds()
+   ```
+
+   Normally, pylint will throw errors like:
+
+   ```
+    E: 1,0: No name 'seconds' in module 'reactor'
+   ```
+
+   twisted reactor modules actually imports different modules base on the OS type at runtime.
+   `pylint-twisted` will run the imports to let pylint know the actual reactor module, so pylint can continue
+   checking your code.
 
 ## Usage
 
