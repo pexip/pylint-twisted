@@ -1,3 +1,4 @@
+from __future__ import print_function
 """Brains for helping silence pylint errors/warnings from defer.inlineCallbacks."""
 import astroid
 
@@ -45,7 +46,7 @@ def _infer_inlineCallbacks(node, context=None):  # pylint: disable=unused-argume
     """)
     inlineCallbacks_function = next(
         module.igetattr(node.name, context=context))
-    print inlineCallbacks_function
+    print(inlineCallbacks_function)
     return iter([inlineCallbacks_function])
 
 astroid.MANAGER.register_transform(
