@@ -1,33 +1,26 @@
 """Brains for helping silence pylint errors/warnings from twisted"""
 import astroid
 
+_DEFER_MODULE = astroid.MANAGER.ast_from_module_name("twisted.internet.defer")
+_DEFERRED_IMPL = _DEFER_MODULE["Deferred"].instantiate_class()
 
-def _is_inlineCallbacks(node):
-    """Check whether a FunctionDef node is decorated with defer.inlineCallbacks."""
+
+def _is_inline_callbacks(node):
+    """Check whether a FunctionDef node is decorated with defer.inlineCallbacks"""
     if not node.decorators:
         return False
-    res = 'twisted.internet.defer.inlineCallbacks' in node.decoratornames()
-    return register
+    return "twisted.internet.defer.inlineCallbacks" in node.decoratornames()
+
 
 @astroid.inference_tip
-def _infer_inlineCallbacks(node, context=None):  # pylint: disable=unused-argument
+def _infer_inline_callbacks(node, context=None):
     """Infer the type of inlineCallbackss."""
-
-    # Does the name of the function matter?  Should it be global?
-    module = astroid.parse("""
-    import twisted.internet.defer
-    def inlineCallbacks_function(*args, **kwargs):
-        return twisted.internet.defer.Deferred()
-    """)
-    inlineCallbacks_function = next(
-        module.igetattr(node.name, context=context))
-    return iter([inlineCallbacks_function])
+    return _DEFERRED_IMPL.igetattr(node.name, context=context)
 
 
 astroid.MANAGER.register_transform(
-    astroid.FunctionDef,
-    _infer_inlineCallbacks,
-    _is_inlineCallbacks)
+    astroid.FunctionDef, _infer_inline_callbacks, _is_inline_callbacks
+)
 
 
 # == Infer twisted.internet.reactor type ==
