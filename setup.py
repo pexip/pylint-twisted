@@ -3,7 +3,7 @@ from distutils.core import setup
 import sys
 
 
-_version = '0.1'
+_version = '0.2'
 _packages = ['pylint_twisted']
 
 _short_description = "pylint-twisted is a Pylint plugin to aid Pylint in \
@@ -21,15 +21,15 @@ _install_requires += [
 
 setup(
     name='pylint-twisted',
-    url='https://github.com/jonnyyu/pylint-twisted',
-    author='Jonny Yu',
-    author_email='yingshen.yu@gmail.com',
+    url='https://github.com/pexip/pylint-twisted',
+    author='Pexip AS',
+    author_email='packaing@pexip.com',
     description=_short_description,
     version=_version,
     packages=_packages,
     install_requires=_install_requires,
     license='GPLv2',
-    download_url=("https://github.com/jonnyyu/pylint-twisted/tarball/v" +
+    download_url=("https://github.com/pexip/pylint-twisted/tarball/v" +
                   str(_version)),
     keywords='pylint twisted plugin'
 )

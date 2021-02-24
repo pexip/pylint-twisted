@@ -1,5 +1,6 @@
 pylint-twisted
 ===============
+Based on an original implementation by Jonny Yu ([jonnyyu/pylint-twisted](https://github.com/jonnyyu/pylint-twisted))
 
 ## About
 
@@ -69,7 +70,7 @@ pylint --load-plugins pylint_twisted [..your module..]
 Pull requests are always welcome.  Here's an outline of the steps you need to
 prepare your code.
 
-1. git clone https://github.com/jonnyyu/pylint-twisted.git
+1. git clone https://github.com/pexip/pylint-twisted.git
 2. cd pylint-twisted
 3. mkvirtualenv pylint-twisted
 4. pip install -r dev-requirements.txt
@@ -78,5 +79,3 @@ prepare your code.
 7. Make sure everything is green by running `tox`
 7. git push origin MY-NEW-FIX
 8. Create a pull request
-
-## License
