@@ -1,15 +1,23 @@
 """Brains for helping silence pylint errors/warnings from twisted"""
 import astroid
 
+from pylint.checkers import BaseChecker
+from pylint.interfaces import IAstroidChecker
+
 _DEFER_MODULE = astroid.MANAGER.ast_from_module_name("twisted.internet.defer")
 _DEFERRED_IMPL = _DEFER_MODULE["Deferred"].instantiate_class()
 
 
-def _is_inline_callbacks(node):
-    """Check whether a FunctionDef node is decorated with defer.inlineCallbacks"""
+def _has_decorator(node, decorator):
+    """Get whether or not a node has a decorator"""
     if not node.decorators:
         return False
-    return "twisted.internet.defer.inlineCallbacks" in node.decoratornames()
+    return decorator in node.decoratornames()
+
+
+def _is_inline_callbacks(node):
+    """Check whether a FunctionDef node is decorated with defer.inlineCallbacks"""
+    return _has_decorator(node, "twisted.internet.defer.inlineCallbacks")
 
 
 @astroid.inference_tip
@@ -21,6 +29,48 @@ def _infer_inline_callbacks(node, context=None):
 astroid.MANAGER.register_transform(
     astroid.FunctionDef, _infer_inline_callbacks, _is_inline_callbacks
 )
+
+
+class DeferInlineCallbacksChecker(BaseChecker):
+    """defer.inlineCallbacks checker"""
+
+    __implements__ = IAstroidChecker
+
+    name = "defer-inlinecallbacks"
+    priority = -1
+    msgs = {
+        "E6900": (
+            "Function decorated with defer.inlineCallbacks does not produce a generator",
+            "does-not-produce-generator",
+            "A function decorated with defer.inlineCallbacks must produce generator.",
+        )
+    }
+
+    def _generate_children(self, node):
+        try:
+            for child in node.get_children():
+                yield child
+                yield from self._generate_children(child)
+        except (AttributeError, TypeError):
+            yield child
+
+    def _produces_generator(self, node):
+        """Determine whether a node produces a generator or not"""
+        return any(
+            isinstance(n, astroid.nodes.Yield) for n in self._generate_children(node)
+        )
+
+    def leave_functiondef(self, node):
+        # Ignore any methods that aren't decorated with defer.inlineCallbacks
+        if not _is_inline_callbacks(node):
+            return
+
+        # Ignore abstract methods as these can have no body, and therefore no yield
+        if _has_decorator(node, "abc.abstractmethod"):
+            return
+
+        if not self._produces_generator(node):
+            self.add_message("does-not-produce-generator", node=node)
 
 
 # == Infer twisted.internet.reactor type ==
@@ -66,3 +116,4 @@ astroid.MANAGER.register_transform(
 
 def register(linter):
     """Required to register the plugin with pylint"""
+    linter.register_checker(DeferInlineCallbacksChecker(linter))
