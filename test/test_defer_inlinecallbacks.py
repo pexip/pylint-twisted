@@ -46,3 +46,23 @@ def foo():
 
         with self.assertNotMessages():
             self.checker.visit_functiondef(function_node)
+
+    def test_sub_definitions(self):
+        function_node = astroid.extract_node("""\
+from twisted.internet import defer
+
+@defer.inlineCallbacks
+def foo():
+    @defer.inlineCallbacks
+    def bar():
+        yield "wibble"
+    return bar()
+""")
+
+        with self.assertAddsMessages(
+            pylint.testutils.Message(
+                msg_id="does-not-produce-generator",
+                node=function_node,
+            ),
+        ):
+            self.checker.visit_functiondef(function_node)

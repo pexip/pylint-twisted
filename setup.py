@@ -3,7 +3,7 @@ from distutils.core import setup
 import sys
 
 
-_version = '0.3'
+_version = '0.3.1'
 _packages = ['pylint_twisted']
 
 _short_description = "pylint-twisted is a Pylint plugin to aid Pylint in \
