@@ -52,7 +52,7 @@ class DeferInlineCallbacksChecker(BaseChecker):
                 # If the function node also contains a function def, ignore these as
                 # they will be checked separately
                 if isinstance(child, astroid.nodes.FunctionDef):
-                    return
+                    continue
                 yield child
                 yield from self._generate_children(child)
         except (AttributeError, TypeError):
