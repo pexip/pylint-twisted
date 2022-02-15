@@ -1,8 +1,16 @@
-import pylint_twisted
-import pylint.testutils
+import astroid
 
-class DeferInlineCallbacksCheckerTest(pylint.testutils.CheckerTestCase):
-    CHECKER_CLASS = pylint_twisted.DeferInlineCallbacksChecker
+from pylint.testutils import CheckerTestCase
+try:
+    from pylint.testutils import MessageTest as Message
+except ImportError:
+    from pylint.testutils import Message
+
+from pylint_twisted import DeferInlineCallbacksChecker
+
+
+class TestDeferInlineCallbacksChecker(CheckerTestCase):
+    CHECKER_CLASS = DeferInlineCallbacksChecker
 
     def test_not_a_generator(self):
         function_node = astroid.extract_node("""\
@@ -14,12 +22,12 @@ def foo():
 """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            Message(
                 msg_id="does-not-produce-generator",
                 node=function_node,
             ),
         ):
-            self.checker.visit_functiondef(function_node)
+            self.checker.leave_functiondef(function_node)
 
     def test_is_generator(self):
         function_node = astroid.extract_node("""\
@@ -30,8 +38,8 @@ def foo():
     yield "bar"
 """)
 
-        with self.assertNotMessages():
-            self.checker.visit_functiondef(function_node)
+        with self.assertNoMessages():
+            self.checker.leave_functiondef(function_node)
 
     def test_abstract_method(self):
         function_node = astroid.extract_node("""\
@@ -44,8 +52,8 @@ def foo():
     return "bar"
 """)
 
-        with self.assertNotMessages():
-            self.checker.visit_functiondef(function_node)
+        with self.assertNoMessages():
+            self.checker.leave_functiondef(function_node)
 
     def test_sub_definitions(self):
         function_node = astroid.extract_node("""\
@@ -60,9 +68,9 @@ def foo():
 """)
 
         with self.assertAddsMessages(
-            pylint.testutils.Message(
+            Message(
                 msg_id="does-not-produce-generator",
                 node=function_node,
             ),
         ):
-            self.checker.visit_functiondef(function_node)
+            self.checker.leave_functiondef(function_node)

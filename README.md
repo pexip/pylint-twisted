@@ -73,9 +73,10 @@ prepare your code.
 1. git clone https://github.com/pexip/pylint-twisted.git
 2. cd pylint-twisted
 3. mkvirtualenv pylint-twisted
-4. pip install -r dev-requirements.txt
-5. git checkout -b MY-NEW-FIX
-6. Hack away
-7. Make sure everything is green by running `tox`
-7. git push origin MY-NEW-FIX
-8. Create a pull request
+4. pip install poetry
+5. poetry install
+6. git checkout -b MY-NEW-FIX
+7. Hack away
+8. Make sure everything is green by running `pytest`
+9. git push origin MY-NEW-FIX
+10. Create a pull request

@@ -83,7 +83,7 @@ class DeferInlineCallbacksChecker(BaseChecker):
 # To find the reactor, we import the default reactor for the platform and mock install it
 # to get our hands on the actual reactor that would be used.
 # Next we use inspect to get the reactor module/class name.
-# Finally we load this as an AST node and transform the AST to refer to this node whenever
+# Finally, we load this as an AST node and transform the AST to refer to this node whenever
 # the reactor module is referenced.
 
 
