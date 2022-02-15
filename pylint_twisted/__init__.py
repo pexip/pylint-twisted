@@ -4,6 +4,7 @@ import astroid
 from pylint.checkers import BaseChecker
 from pylint.interfaces import IAstroidChecker
 
+
 _DEFER_MODULE = astroid.MANAGER.ast_from_module_name("twisted.internet.defer")
 _DEFERRED_IMPL = _DEFER_MODULE["Deferred"].instantiate_class()
 
@@ -77,6 +78,36 @@ class DeferInlineCallbacksChecker(BaseChecker):
             self.add_message("does-not-produce-generator", node=node)
 
 
+class DeferReturnValueChecker(BaseChecker):
+    """defer.returnValue checker"""
+
+    __implements__ = IAstroidChecker
+
+    name = "defer-returnvalue"
+    priority = -1
+    msgs = {
+        "R6901": (
+            "Use of defer.returnValue",
+            "legacy-return",
+            "A return statement should be used instead of defer.returnValue",
+        )
+    }
+
+    def visit_call(self, node):
+        if not isinstance(node, astroid.Call):
+            return
+        func = node.func
+        if isinstance(func, astroid.Attribute):
+            func_name = func.attrname
+        elif isinstance(func, astroid.Name):
+            func_name = func.name
+        else:
+            func_name = None
+
+        if func_name == "returnValue":
+            self.add_message("legacy-return", node=node)
+
+
 # == Infer twisted.internet.reactor type ==
 # Because of the abhorrent twisted sys.modules hackery, pylint can't find the reactor, so
 # we're going to help.
@@ -121,3 +152,4 @@ astroid.MANAGER.register_transform(
 def register(linter):
     """Required to register the plugin with pylint"""
     linter.register_checker(DeferInlineCallbacksChecker(linter))
+    linter.register_checker(DeferReturnValueChecker(linter))
