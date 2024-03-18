@@ -25,6 +25,10 @@ def foo():
             Message(
                 msg_id="does-not-produce-generator",
                 node=function_node,
+                line=4,
+                end_line=4,
+                col_offset=0,
+                end_col_offset=7,
             ),
         ):
             self.checker.leave_functiondef(function_node)
@@ -71,6 +75,10 @@ def foo():
             Message(
                 msg_id="does-not-produce-generator",
                 node=function_node,
+                line=4,
+                end_line=4,
+                col_offset=0,
+                end_col_offset=7,
             ),
         ):
             self.checker.leave_functiondef(function_node)
