@@ -1,4 +1,4 @@
-# pylint: disable=missing-docstring, wrong-import-position
+# pylint: disable=missing-docstring
 from twisted.internet import reactor
 
 
