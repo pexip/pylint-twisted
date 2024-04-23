@@ -2,7 +2,6 @@
 import astroid
 
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker
 
 
 _DEFER_MODULE = astroid.MANAGER.ast_from_module_name("twisted.internet.defer")
@@ -34,8 +33,6 @@ astroid.MANAGER.register_transform(
 
 class DeferInlineCallbacksChecker(BaseChecker):
     """defer.inlineCallbacks checker"""
-
-    __implements__ = IAstroidChecker
 
     name = "defer-inlinecallbacks"
     priority = -1
@@ -80,8 +77,6 @@ class DeferInlineCallbacksChecker(BaseChecker):
 
 class DeferReturnValueChecker(BaseChecker):
     """defer.returnValue checker"""
-
-    __implements__ = IAstroidChecker
 
     name = "defer-returnvalue"
     priority = -1

@@ -3,7 +3,10 @@ import csv
 from pathlib import Path
 
 from pylint.testutils import LintModuleTest
-from pylint.testutils.functional_test_file import FunctionalTestFile
+try:
+    from pylint.testutils.functional import FunctionalTestFile
+except ImportError:
+    from pylint.testutils.functional_test_file import FunctionalTestFile
 
 import pylint_twisted
 

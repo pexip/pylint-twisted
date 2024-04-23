@@ -1,8 +1,8 @@
-# [missing-module-docstring]
+# pylint: disable=missing-docstring, wrong-import-position
 from twisted.internet import reactor
 
 
-def call_when_running():  # [missing-function-docstring]
+def call_when_running():
     reactor.attr_error()  # [no-member]
     reactor.stop()
 
