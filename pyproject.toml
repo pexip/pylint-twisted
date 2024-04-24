@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pylint-twisted"
-version = "0.5.0"
+version = "0.5.1"
 license = "GPLv2"
 description = "pylint-twisted is a Pylint plugin to aid Pylint in recognizing and understanding errors caused when using Twisted"
 authors = [
