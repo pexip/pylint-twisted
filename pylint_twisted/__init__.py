@@ -40,6 +40,8 @@ def {node.name}():
     wrapped_func.parent = node.parent
     # Ensure the args match
     wrapped_func.args = node.args
+    # Ensure all decorators get propagated
+    wrapped_func.decorators = node.decorators
     return iter([wrapped_func])
 
 
