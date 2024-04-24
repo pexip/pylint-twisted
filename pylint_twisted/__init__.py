@@ -1,15 +1,15 @@
 """Brains for helping silence pylint errors/warnings from twisted"""
+
 import astroid
 
 from pylint.checkers import BaseChecker
-
 
 _DEFER_MODULE = astroid.MANAGER.ast_from_module_name("twisted.internet.defer")
 _DEFERRED_IMPL = _DEFER_MODULE["Deferred"]
 
 
 def _has_decorator(node, decorator):
-    """Get whether or not a node has a decorator"""
+    """Get whether a node has a decorator"""
     if not node.decorators:
         return False
     return decorator in node.decoratornames()
@@ -21,9 +21,26 @@ def _is_inline_callbacks(node):
 
 
 @astroid.inference_tip
-def _infer_inline_callbacks(node, context=None):
-    """Infer the type of inlineCallbackss."""
-    return iter([_DEFERRED_IMPL])
+def _infer_inline_callbacks(node: astroid.nodes.FunctionDef, context=None):
+    """Infer the type of inlineCallbacks."""
+    # Mock the function call to return a Deferred
+    module = astroid.parse(
+        f"""\
+from twisted.internet import defer
+def {node.name}():
+    return defer.Deferred()
+"""
+    )
+    wrapped_func = next(module.igetattr(node.name, context=context))
+    # Update the node properties to match the original function
+    wrapped_func.lineno = node.lineno
+    wrapped_func.col_offset = node.col_offset
+    wrapped_func.end_lineno = node.end_lineno
+    wrapped_func.end_col_offset = node.end_col_offset
+    wrapped_func.parent = node.parent
+    # Ensure the args match
+    wrapped_func.args = node.args
+    return iter([wrapped_func])
 
 
 astroid.MANAGER.register_transform(
